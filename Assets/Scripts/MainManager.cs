@@ -11,17 +11,20 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text RecordScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
-    private int m_Points;
+    public string currentPlayerName;
+    public int m_Points;
     
     private bool m_GameOver = false;
 
-    
     // Start is called before the first frame update
     void Start()
     {
+        currentPlayerName = RecordManager.Instance.playerName;
+        RecordScoreText.text = "Best Score : " + RecordManager.Instance.recordPlayerName + " : " + RecordManager.Instance.record;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -40,6 +43,10 @@ public class MainManager : MonoBehaviour
 
     private void Update()
     {
+        if (m_Points > RecordManager.Instance.record)
+        {
+            RecordUpdate();
+        }
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -57,7 +64,8 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+                RestartGame();
             }
         }
     }
@@ -72,5 +80,18 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    public void RecordUpdate()
+    {
+        RecordManager.Instance.record = m_Points;
+        RecordManager.Instance.recordPlayerName = currentPlayerName;
+        RecordManager.Instance.Save();
+        RecordScoreText.text = "Best Score : " + RecordManager.Instance.recordPlayerName + " : " + RecordManager.Instance.record;
+
+    }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
